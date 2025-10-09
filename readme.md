@@ -29,6 +29,3 @@ Front-end
 - HTML5 / CSS3  
 - Bootstrap / Angular Material  
 
----
-⚠️ Status do projeto: em andamento 🚧
----
