@@ -82,7 +82,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
+        
+        // Allow requests from any origin (development mode)
+        // For production, replace "*" with your Netlify URL: Arrays.asList("https://meu-app.netlify.app")
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+        
         configuration.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(false); // Must be false when AllowedOrigins is "*"
+        
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
