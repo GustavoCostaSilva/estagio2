@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: helpdesk-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: helpdesk_root_password
+      MYSQL_DATABASE: helpdesk
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-phelpdesk_root_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - helpdesk-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: helpdesk-api
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/helpdesk?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: helpdesk_root_password
+      JWT_SECRET: your_jwt_secret_key_here_change_in_production
+      JWT_EXPIRATION: 1209600000
+    networks:
+      - helpdesk-network
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  helpdesk-network:
+    driver: bridge
